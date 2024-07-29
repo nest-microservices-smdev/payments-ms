@@ -9,14 +9,10 @@ interface EnvVars {
 const envsSchema = joi
   .object({
     PORT: joi.number().default(3000),
-    NATS_SERVERS: joi.array().items(joi.string()).required(),
   })
   .unknown(true);
 
-const { error, value } = envsSchema.validate({
-  ...process.env,
-  NATS_SERVERS: process.env.NATS_SERVERS?.split(','),
-});
+const { error, value } = envsSchema.validate(process.env);
 
 if (error) {
   throw new Error(`Config validation error: ${error.message}`);
