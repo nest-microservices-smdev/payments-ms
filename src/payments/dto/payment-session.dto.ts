@@ -27,9 +27,9 @@ export class PaymentSessionItemDto {
 
   @IsNumber()
   @IsPositive()
-  price: string;
+  price: number;
 
-  @IsString()
+  @IsNumber()
   @IsPositive()
-  quantity: string;
+  quantity: number;
 }
