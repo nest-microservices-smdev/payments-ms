@@ -6,7 +6,7 @@ export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}
 
   @Post('create-payment-session')
-  async createPaymentSession(): Promise<string> {
+  async createPaymentSession() {
     return this.paymentsService.createPaymentSession();
   }
 
