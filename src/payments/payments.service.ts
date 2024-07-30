@@ -6,6 +6,8 @@ import {
   PaymentSessionDto,
   PaymentSessionItemDto,
 } from './dto/payment-session.dto';
+import { Request, Response } from 'express';
+import { request } from 'http';
 
 @Injectable()
 export class PaymentsService {
@@ -36,6 +38,25 @@ export class PaymentsService {
       },
       quantity: quantity,
     }));
+  }
+
+  async stripeWebhook(req: Request, res: Response) {
+    const signature = req.headers['stripe-signature'];
+
+    let event: Stripe.Event;
+    const endpointSecret = '';
+
+    try {
+      event = this.stripe.webhooks.constructEvent(
+        req['rawBody'],
+        signature,
+        endpointSecret,
+      );
+    } catch (error) {
+      res.status(400).send(`Webhook Error: ${error.message}`);
+    }
+
+    return res.status(200).json({ signature });
   }
 
   async paymentSuccess(): Promise<string> {
