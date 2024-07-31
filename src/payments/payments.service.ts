@@ -7,23 +7,24 @@ import {
   PaymentSessionItemDto,
 } from './dto/payment-session.dto';
 import { Request, Response } from 'express';
-import { request } from 'http';
 
 @Injectable()
 export class PaymentsService {
   private readonly stripe = new Stripe(envs.stripeScretKey);
 
   async createPaymentSession(paymentSessionDto: PaymentSessionDto) {
-    const { currency, items } = paymentSessionDto;
+    const { orderId, currency, items } = paymentSessionDto;
 
     return this.stripe.checkout.sessions.create({
       payment_intent_data: {
-        metadata: {},
+        metadata: {
+          orderId,
+        },
       },
       line_items: this.formatListItems(currency, items),
       mode: 'payment',
-      success_url: 'http://localhost:3004/payments/success',
-      cancel_url: 'http://localhost:3004/payments/cancel',
+      success_url: envs.stripeSuccessUrl,
+      cancel_url: envs.stripeCancelUrl,
     });
   }
 
@@ -44,16 +45,24 @@ export class PaymentsService {
     const signature = req.headers['stripe-signature'];
 
     let event: Stripe.Event;
-    const endpointSecret = '';
 
     try {
       event = this.stripe.webhooks.constructEvent(
         req['rawBody'],
         signature,
-        endpointSecret,
+        envs.stripeEndpointSecret,
       );
     } catch (error) {
       res.status(400).send(`Webhook Error: ${error.message}`);
+    }
+
+    switch (event.type) {
+      case 'charge.succeeded':
+        console.log('Payment was successful');
+        break;
+
+      default:
+        console.log('Event no handled');
     }
 
     return res.status(200).json({ signature });
