@@ -65,6 +65,8 @@ export class PaymentsService {
     switch (event.type) {
       case 'charge.succeeded':
         console.log('Payment was successful');
+        console.log('METADATA', event.data.object.metadata);
+
         break;
 
       default:
