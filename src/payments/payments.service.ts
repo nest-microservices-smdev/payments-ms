@@ -15,7 +15,7 @@ export class PaymentsService {
   async createPaymentSession(paymentSessionDto: PaymentSessionDto) {
     const { orderId, currency, items } = paymentSessionDto;
 
-    return this.stripe.checkout.sessions.create({
+    const session = await this.stripe.checkout.sessions.create({
       payment_intent_data: {
         metadata: {
           orderId,
@@ -26,6 +26,12 @@ export class PaymentsService {
       success_url: envs.stripeSuccessUrl,
       cancel_url: envs.stripeCancelUrl,
     });
+
+    return {
+      cancelUrl: session.cancel_url,
+      successUrl: session.success_url,
+      url: session.url,
+    };
   }
 
   formatListItems(currency: string, items: PaymentSessionItemDto[]) {
