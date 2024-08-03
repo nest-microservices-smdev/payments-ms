@@ -9,6 +9,7 @@ import {
 import { Request, Response } from 'express';
 import { NATS_SERVICE } from 'src/config/services';
 import { ClientProxy } from '@nestjs/microservices';
+import { NotifyPaidOrderDto } from './dto/notify-payment.dto';
 
 @Injectable()
 export class PaymentsService {
@@ -71,7 +72,7 @@ export class PaymentsService {
       case 'charge.succeeded':
         const chargeSucceeded = event.data.object;
 
-        const payload = {
+        const payload: NotifyPaidOrderDto = {
           stripePaymentId: chargeSucceeded.id,
           orderId: chargeSucceeded.metadata.orderId,
           receiptUrl: chargeSucceeded.receipt_url,
